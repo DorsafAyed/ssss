@@ -1,0 +1,42 @@
+import { Component, OnDestroy, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-grafana',
+  standalone: true,
+  imports: [],
+  templateUrl: './grafana.component.html',
+  styleUrl: './grafana.component.scss'
+})
+export class GrafanaComponent  implements OnInit, OnDestroy {
+
+  private refreshInterval: any;
+
+  constructor() { }
+
+  ngOnInit(): void {
+    this.startAutoRefresh();
+  }
+
+  ngOnDestroy(): void {
+    this.stopAutoRefresh();
+  }
+
+  startAutoRefresh(): void {
+    // Refresh every 5 seconds
+    this.refreshInterval = setInterval(() => {
+      const iframe = document.getElementById('grafanaPanel') as HTMLIFrameElement;
+      if (iframe) {
+        const src = iframe.src;
+        // Append a unique query parameter to force reload
+        iframe.src = src.includes('?') ? `${src}&_=${new Date().getTime()}` : `${src}?_=${new Date().getTime()}`;
+      }
+    }, 5000);
+  }
+
+  stopAutoRefresh(): void {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+    }
+  }
+
+}
